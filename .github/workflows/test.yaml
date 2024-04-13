@@ -1,0 +1,41 @@
+name: test-manual-approve
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Enter the Docker image tag to deploy to EKS'
+        required: true
+
+jobs:
+  notify-for-approval:
+    name: Notify for Approval
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord for Approval
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: 'Deployment approval needed for ${{ github.event.inputs.tag }}. Approve it here: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+
+  approve-deployment:
+    name: Approve Deployment
+    needs: notify-for-approval
+    runs-on: ubuntu-latest
+    steps:
+      - name: Manually approve deployment
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: ethan510010
+          minimum-approvals: 1
+
+  test-manual-approve:
+    name: Test Manual Approve
+    needs: approve-deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: test approve
+        run: |
+          echo "test approve success"
