@@ -19,22 +19,27 @@ jobs:
         with:
           args: 'Deployment approval needed for ${{ github.event.inputs.tag }}. Approve it here: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
 
-  approve-deployment:
-    name: Approve Deployment
-    needs: notify-for-approval
-    runs-on: ubuntu-latest
-    steps:
-      - name: Manually approve deployment
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ github.TOKEN }}
-          approvers: ethan510010
-          minimum-approvals: 1
+
+#  approve-deployment:
+#    name: Approve Deployment
+#    needs: notify-for-approval
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Manually approve deployment
+#        uses: trstringer/manual-approval@v1
+#        with:
+#          secret: ${{ github.TOKEN }}
+#          approvers: ethan510010
+#          minimum-approvals: 1
+
+
 
   test-manual-approve:
     name: Test Manual Approve
-    needs: approve-deployment
+#    needs: approve-deployment
+    needs: notify-for-approval
     runs-on: ubuntu-latest
+    environment: Production
     steps:
       - name: test approve
         run: |
